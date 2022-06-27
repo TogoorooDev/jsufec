@@ -44,7 +44,7 @@ public class Message {
 		output.write(contentBytes, 0, contentBytes.length);
 		return output.toByteArray();
 	}
-	public Message fromBytes(ByteBuffer bytes) throws InvalidMessageException {
+	public static Message fromBytes(ByteBuffer bytes) throws InvalidMessageException {
 		ArrayList recipients = new ArrayList();
 		// Deal with Java bytes being signed
 		int numOtherRecipients = bytes.get() & 0xff;
@@ -59,6 +59,6 @@ public class Message {
 		}
 		ByteBuffer contentBytes = bytes.slice();
 		MessageContent content = MessageContent.fromBytes(contentBytes);
-		return new Message(otherRecipients, timestamp, hashes, content);
+		return new Message(recipients, timestamp, hashes, content);
 	}
 }
