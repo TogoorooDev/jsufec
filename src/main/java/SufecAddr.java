@@ -1,8 +1,5 @@
 package libsufec;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Arrays;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import com.goterl.lazysodium.utils.Key;
@@ -18,7 +15,7 @@ public class SufecAddr {
 	public byte[] toBytes() {
 		byte[] idBytes = this.id.getAsBytes();
 		byte[] atBytes = this.at.getBytes(StandardCharsets.UTF_8);
-		byte[] output = new byte[32 + 1 + atBytes.length];
+		byte[] output = new byte[KeyExchange.PUBLICKEYBYTES + 1 + atBytes.length];
 		System.arraycopy(idBytes, 0, output, 0, KeyExchange.PUBLICKEYBYTES);
 		output[KeyExchange.PUBLICKEYBYTES] = (byte) atBytes.length;
 		System.arraycopy(atBytes, 0, output, KeyExchange.PUBLICKEYBYTES + 1, atBytes.length);
