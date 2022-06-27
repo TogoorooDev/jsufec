@@ -14,7 +14,7 @@ public interface MessageContent {
 			case 0:
 				return new MessageContentText(new String(contentBytes, StandardCharsets.UTF_8));
 			default:
-				throw new InvalidMessageException("unknown message type");
+				throw new InvalidMessageException();
 		}
 	}
 }

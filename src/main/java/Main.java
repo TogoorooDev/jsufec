@@ -21,11 +21,7 @@ public class Main {
 
 		MessageContent content = new MessageContentText("blah");
 		Message msg = new Message(new ArrayList(), Instant.now(), new ArrayList(), content);
-		byte[] bytes = msg.toBytes();
-		Message msg2 = Message.fromBytes(ByteBuffer.wrap(bytes));
-		for (int i = 0; i < msg.content.toBytes().length; i++) {
-			System.out.println(msg.content.toBytes()[i]);
-			System.out.println(msg2.content.toBytes()[i]);
-		}
+		byte[] bs = {0, 1, 2};
+		Message msg2 = Message.fromBytes(ByteBuffer.wrap(bs));
 	}
 }

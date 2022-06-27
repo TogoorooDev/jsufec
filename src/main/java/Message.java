@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.time.Instant;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
+import java.nio.BufferUnderflowException;
 
 import libsufec.MessageContent;
 import libsufec.MessageHash;
@@ -45,20 +46,24 @@ public class Message {
 		return output.toByteArray();
 	}
 	public static Message fromBytes(ByteBuffer bytes) throws InvalidMessageException {
-		ArrayList recipients = new ArrayList();
-		// Deal with Java bytes being signed
-		int numOtherRecipients = bytes.get() & 0xff;
-		for (int i = 0; i < numOtherRecipients; i++) {
-			recipients.add(SufecAddr.fromBytes(bytes));
+		try {
+			ArrayList recipients = new ArrayList();
+			// Deal with Java bytes being signed
+			int numOtherRecipients = bytes.get() & 0xff;
+			for (int i = 0; i < numOtherRecipients; i++) {
+				recipients.add(SufecAddr.fromBytes(bytes));
+			}
+			Instant timestamp = Instant.ofEpochMilli(bytes.getLong());
+			ArrayList hashes = new ArrayList();
+			int numHashes = bytes.get() & 0xff;
+			for (int i = 0; i < numHashes; i++) {
+				hashes.add(MessageHash.fromBytes(bytes));
+			}
+			ByteBuffer contentBytes = bytes.slice();
+			MessageContent content = MessageContent.fromBytes(contentBytes);
+			return new Message(recipients, timestamp, hashes, content);
+		} catch (BufferUnderflowException e) {
+			throw new InvalidMessageException();
 		}
-		Instant timestamp = Instant.ofEpochMilli(bytes.getLong());
-		ArrayList hashes = new ArrayList();
-		int numHashes = bytes.get() & 0xff;
-		for (int i = 0; i < numHashes; i++) {
-			hashes.add(MessageHash.fromBytes(bytes));
-		}
-		ByteBuffer contentBytes = bytes.slice();
-		MessageContent content = MessageContent.fromBytes(contentBytes);
-		return new Message(recipients, timestamp, hashes, content);
 	}
 }
