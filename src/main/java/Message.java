@@ -14,8 +14,19 @@ import libsufec.InvalidMessageException;
 public class Message {
 	public ArrayList<SufecAddr> otherRecipients;
 	public Instant timestamp;
-	public MessageContent content;
 	public ArrayList<MessageHash> hashes;
+	public MessageContent content;
+	public Message(
+		ArrayList<SufecAddr> otherRecipients,
+		Instant timestamp,
+		ArrayList<MessageHash> hashes,
+		MessageContent content
+	) {
+		this.otherRecipients = otherRecipients;
+		this.timestamp = timestamp;
+		this.hashes = hashes;
+		this.content = content;
+	}
 	public byte[] toBytes() {
 		ByteArrayOutputStream output = new ByteArrayOutputStream();
 		output.write(this.otherRecipients.size());
@@ -33,6 +44,20 @@ public class Message {
 		output.write(contentBytes, 0, contentBytes.length);
 		return output.toByteArray();
 	}
-	// public Message fromBytes() throws InvalidMessageException {
-	// }
+	public Message fromBytes(ByteBuffer bytes) throws InvalidMessageException {
+		ArrayList recipients = new ArrayList();
+		// Deal with Java bytes being signed
+		int numOtherRecipients = bytes.get() & 0xff;
+		for (int i = 0; i < numOtherRecipients; i++) {
+			recipients.add(SufecAddr.fromBytes(bytes));
+		}
+		Instant timestamp = Instant.ofEpochMilli(bytes.getLong());
+		ArrayList hashes = new ArrayList();
+		int numHashes = bytes.get() & 0xff;
+		for (int i = 0; i < numHashes; i++) {
+			hashes.add(MessageHash.fromBytes(bytes));
+		}
+		MessageContent content = MessageContent.fromBytes(bytes);
+		return new Message(otherRecipients, timestamp, hashes, content);
+	}
 }
