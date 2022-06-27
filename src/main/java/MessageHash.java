@@ -18,7 +18,7 @@ public class MessageHash {
 		System.arraycopy(this.hash, 0, output, Long.BYTES, Hash.SHA512_BYTES);
 		return output;
 	}
-	public MessageHash fromBytes(ByteBuffer bytes) {
+	public static MessageHash fromBytes(ByteBuffer bytes) {
 		Instant timestamp = Instant.ofEpochMilli(bytes.getLong());
 		byte[] hash = new byte[128];
 		bytes.get(hash);

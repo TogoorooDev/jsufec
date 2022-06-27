@@ -57,7 +57,8 @@ public class Message {
 		for (int i = 0; i < numHashes; i++) {
 			hashes.add(MessageHash.fromBytes(bytes));
 		}
-		MessageContent content = MessageContent.fromBytes(bytes);
+		ByteBuffer contentBytes = bytes.slice();
+		MessageContent content = MessageContent.fromBytes(contentBytes);
 		return new Message(otherRecipients, timestamp, hashes, content);
 	}
 }
