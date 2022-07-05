@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: com.goterl:lazysodium-java:5.1.1">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.goterl/lazysodium-java/5.1.1/a424f707d0469232b4bb4c1089a1fddda4b45b38/lazysodium-java-5.1.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.goterl/lazysodium-java/5.1.1/9e8efa6ef10d8aec3ca7160520890a10e5833772/lazysodium-java-5.1.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

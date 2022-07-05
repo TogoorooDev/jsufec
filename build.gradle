@@ -22,5 +22,5 @@ dependencies {
 }
 
 application {
-	mainClass = 'libsufec.Main'
+	mainClass = 'jsufec.Main'
 }

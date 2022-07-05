@@ -1,8 +1,6 @@
-package libsufec;
+package jsufec;
 
 import java.nio.charset.StandardCharsets;
-
-import libsufec.MessageContent;
 
 public class MessageContentText implements MessageContent {
 	public String text;

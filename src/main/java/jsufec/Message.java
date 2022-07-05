@@ -1,4 +1,4 @@
-package libsufec;
+package jsufec;
 
 import java.util.ArrayList;
 import java.time.Instant;
@@ -6,11 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.BufferUnderflowException;
 
-import libsufec.MessageContent;
-import libsufec.MessageHash;
-import libsufec.SufecAddr;
-import libsufec.Byteconv;
-import libsufec.InvalidMessageException;
+import jsufec.ByteConv;
 
 public class Message {
 	public ArrayList<SufecAddr> otherRecipients;
@@ -35,7 +31,7 @@ public class Message {
 			byte[] addrBytes = addr.toBytes();
 			output.write(addrBytes, 0, addrBytes.length);
 		}
-		output.write(Byteconv.longToBytes(this.timestamp.toEpochMilli()), 0, Long.BYTES);
+		output.write(ByteConv.longToBytes(this.timestamp.toEpochMilli()), 0, Long.BYTES);
 		output.write(this.hashes.size());
 		for (MessageHash hash : this.hashes) {
 			byte[] hashBytes = hash.toBytes();

@@ -1,4 +1,4 @@
-package libsufec;
+package jsufec;
 
 import java.time.Instant;
 import java.nio.ByteBuffer;
@@ -13,7 +13,7 @@ public class MessageHash {
 	}
 	public byte[] toBytes() {
 		byte[] output = new byte[Long.BYTES + Hash.SHA512_BYTES];
-		byte[] timestampBytes = Byteconv.longToBytes(this.timestamp.toEpochMilli());
+		byte[] timestampBytes = ByteConv.longToBytes(this.timestamp.toEpochMilli());
 		System.arraycopy(timestampBytes, 0, output, 0, Long.BYTES);
 		System.arraycopy(this.hash, 0, output, Long.BYTES, Hash.SHA512_BYTES);
 		return output;

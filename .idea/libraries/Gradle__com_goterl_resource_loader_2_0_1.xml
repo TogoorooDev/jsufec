@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: com.goterl:resource-loader:2.0.1">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.goterl/resource-loader/2.0.1/9a7ece414939a13c660fddc5fecdf1f7f06fcd1c/resource-loader-2.0.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.goterl/resource-loader/2.0.1/2aaade606229e66b490890ae3aa84481919b9d0d/resource-loader-2.0.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

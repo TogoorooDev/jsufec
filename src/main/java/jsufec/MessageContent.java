@@ -1,9 +1,7 @@
-package libsufec;
+package jsufec;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import libsufec.MessageContentText;
-import libsufec.InvalidMessageException;
 
 public interface MessageContent {
 	byte[] toBytes();
