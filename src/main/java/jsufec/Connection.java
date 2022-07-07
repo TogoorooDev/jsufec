@@ -1,7 +1,5 @@
 package jsufec;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.io.InputStream;
@@ -15,6 +13,7 @@ import java.util.Arrays;
 
 import com.goterl.lazysodium.LazySodium;
 import com.goterl.lazysodium.exceptions.SodiumException;
+import com.goterl.lazysodium.interfaces.Box;
 import com.goterl.lazysodium.interfaces.KeyExchange;
 import com.goterl.lazysodium.utils.Key;
 import com.sun.jna.ptr.ByteByReference;
@@ -26,8 +25,8 @@ public class Connection {
 	private InputStream input;
 	private Key serverKey;
 	private Key sessionKey;
-	//private Connection.Stream stream;
-	private int nonce;
+	private Stream stream;
+	private byte[] nonce;
 	private Key oldEphKeySec;
 	private Key newEphKeySec;
 	private Account account;
@@ -38,10 +37,15 @@ public class Connection {
 	}
 
 	public Connection(String server, int port) throws IOException {
+		this.nonce = new byte[Box.NONCEBYTES];
+		Arrays.fill(this.nonce, (byte) 0);
+
 		this.socket = new Socket(server, port);
-		this.input = this.socket.getInputStream();
-		this.output = this.socket.getOutputStream();
-		this.serverKey = Key.fromBytes(this.input.readNBytes(KeyExchange.PUBLICKEYBYTES));
+
+		this.stream = new Stream(this.socket.getInputStream(), this.socket.getOutputStream(), this.nonce);
+		this.stream.setInput(this.socket.getInputStream());
+		this.stream.setOutput(this.socket.getOutputStream());
+		this.serverKey = Key.fromBytes(this.stream.getInput().readNBytes(KeyExchange.PUBLICKEYBYTES));
 
 	}
 
@@ -58,14 +62,14 @@ public class Connection {
 
 		ArrayList<ByteBuffer> keyList = new ArrayList<>();
 
-		this.output.write((byte) 0x01); // Header for message sending
+		this.stream.getOutput().write((byte) 0x01); // Header for message sending
 		sessionKey = Key.generate(ls, KeyExchange.PUBLICKEYBYTES); // Key used until connection is closed
 
 		encryptedKey = ls.cryptoBoxSealEasy(sessionKey.toString(), this.serverKey); // this key is sent
 		output.write(ls.toBinary(encryptedKey));
 
-		this.output.write(recipient.DeviceID);
-		encodedKeyLength = this.input.readNBytes(4);
+		this.stream.getOutput().write(recipient.DeviceID);
+		encodedKeyLength = this.stream.getInput().readNBytes(4);
 		keyLengthBuffer = ByteBuffer.wrap(encodedKeyLength);
 		keyLength = keyLengthBuffer.getInt();
 
@@ -74,7 +78,7 @@ public class Connection {
 		}
 
 		//encodedKey = new byte[keyLength];
-		encodedKey = this.input.readNBytes(keyLength);
+		encodedKey = this.stream.getInput().readNBytes(keyLength);
 		keyBuffer = ByteBuffer.wrap(encodedKey);
 
 		if (keyBuffer.position() % KeyExchange.PUBLICKEYBYTES != 0){
@@ -108,50 +112,14 @@ public class Connection {
 
 		this.sessionKey = Key.generate(ls, KeyExchange.PUBLICKEYBYTES);
 
-		this.output.write((byte) 0);
+		this.stream.getOutput().write((byte) 0);
 
 		encId = ls.cryptoBoxSealEasy(account.addr.id.toString(), this.serverKey);
-		this.output.write(ls.toBinary(encId));
+		this.stream.getOutput().write(ls.toBinary(encId));
 
-		this.output.write(account.DeviceID);
-		this.output.write(oldEphKey.getAsBytes());
+		this.stream.getOutput().write(account.DeviceID);
+		this.stream.getOutput().write(oldEphKey.getAsBytes());
 
 	}
-//
-//	public class Stream {
-//		private InputStream input;
-//		private OutputStream output;
-//		private int nonce;
-//
-//		public void Stream(InputStream in, OutputStream out, int newnonce){
-//			this.input = in;
-//			this.output = out;
-//			this.nonce = newnonce;
-//		}
-//
-//		public InputStream getInput() {
-//			return input;
-//		}
-//
-//		public OutputStream getOutput() {
-//			return output;
-//		}
-//
-//		public int getNonce(){
-//			return nonce;
-//		}
-//
-//		public void setInput(InputStream input) {
-//			this.input = input;
-//		}
-//
-//		public void setOutput(OutputStream output) {
-//			this.output = output;
-//		}
-//
-//		public void setNonce(int newnonce) {
-//			nonce = newnonce;
-//		}
-//	}
 
 }

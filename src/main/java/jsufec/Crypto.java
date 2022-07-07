@@ -16,7 +16,7 @@ import jsufec.Message;
 
 
 public class Crypto {
-    static ByteBuffer EncryptMessage(LazySodium ls, Account account, byte[] recipientID, Key recipientEph, Message msg) throws SodiumException{
+    public static ByteBuffer EncryptMessage(LazySodium ls, Account account, byte[] recipientID, Key recipientEph, Message msg) throws SodiumException{
         ByteBuffer out;
         String outstr;
 
@@ -52,5 +52,13 @@ public class Crypto {
         }
 
         return Key.fromBytes(y);
+    }
+
+    public static byte[] incrementNonce(byte[] nonce, int size){
+        ByteBuffer temp = ByteBuffer.wrap(nonce);
+        int i = temp.getInt();
+        ByteBuffer ret = ByteBuffer.allocate(size);
+        ret.putInt(i);
+        return ret.array();
     }
 }
