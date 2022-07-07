@@ -26,7 +26,7 @@ public class Connection {
 	private InputStream input;
 	private Key serverKey;
 	private Key sessionKey;
-	private Connection.Stream stream;
+	//private Connection.Stream stream;
 	private int nonce;
 	private Key oldEphKeySec;
 	private Key newEphKeySec;
@@ -37,7 +37,7 @@ public class Connection {
 		return this.serverKey;
 	}
 
-	public Connection(String server, int port) throws IOException, UnknownHostException {
+	public Connection(String server, int port) throws IOException {
 		this.socket = new Socket(server, port);
 		this.input = this.socket.getInputStream();
 		this.output = this.socket.getOutputStream();
@@ -45,12 +45,12 @@ public class Connection {
 
 	}
 
-	public void send(LazySodium ls, Key recipient, Message message) throws IOException, SodiumException, Exception {
+	public void send(LazySodium ls, Account recipient, Message message) throws Exception {
 		Key sessionKey;
 		String encryptedKey;
 
 		int keyLength;
-		byte[] encodedKeyLength = new byte[4];
+		byte[] encodedKeyLength;
 		ByteBuffer keyLengthBuffer;
 
 		byte[] encodedKey;
@@ -64,7 +64,7 @@ public class Connection {
 		encryptedKey = ls.cryptoBoxSealEasy(sessionKey.toString(), this.serverKey); // this key is sent
 		output.write(ls.toBinary(encryptedKey));
 
-		this.output.write(recipient.getAsBytes());
+		this.output.write(recipient.DeviceID.getAsBytes());
 		encodedKeyLength = this.input.readNBytes(4);
 		keyLengthBuffer = ByteBuffer.wrap(encodedKeyLength);
 		keyLength = keyLengthBuffer.getInt();
@@ -81,20 +81,23 @@ public class Connection {
 			throw new Exception("Invalid Key Length");
 		}
 
-		int i = 0;
+		int i = 1;
 		int workingBeg = 0;
 		int workingEnd = KeyExchange.PUBLICKEYBYTES;
+		int pos = 0;
 
-		while (keyBuffer.position() > KeyExchange.PUBLICKEYBYTES){
-//			 byte[] newBuf = keyBuffer.array();
-			 keyList.add(ByteBuffer.wrap(Arrays.copyOfRange(keyBuffer.array(), workingBeg, workingEnd)));
-//			 i++;
+		while (pos < KeyExchange.PUBLICKEYBYTES){
+			keyList.add(ByteBuffer.wrap(Arrays.copyOfRange(keyBuffer.array(), workingBeg, workingEnd)));
 			workingBeg = workingEnd + 1;
 			workingEnd = KeyExchange.PUBLICKEYBYTES * i;
+			pos += KeyExchange.PUBLICKEYBYTES * i;
+			i++;
 		}
 
 		for (ByteBuffer buf : keyList){
-			ByteBuffer copy = Crypto.EncryptMessage();
+			ByteBuffer copy = Crypto.EncryptMessage(ls, account, recipient.DeviceID, Key.fromBytes(buf.array()), message);
+			output.write(copy.position());
+			output.write(copy.array());
 		}
 
 
@@ -110,44 +113,45 @@ public class Connection {
 		encId = ls.cryptoBoxSealEasy(account.addr.id.toString(), this.serverKey);
 		this.output.write(ls.toBinary(encId));
 
-		this.output.write(ls.toBinary(account.DeviceID));
+		this.output.write(account.DeviceID.getAsBytes());
 		this.output.write(oldEphKey.getAsBytes());
 
 	}
+//
+//	public class Stream {
+//		private InputStream input;
+//		private OutputStream output;
+//		private int nonce;
+//
+//		public void Stream(InputStream in, OutputStream out, int newnonce){
+//			this.input = in;
+//			this.output = out;
+//			this.nonce = newnonce;
+//		}
+//
+//		public InputStream getInput() {
+//			return input;
+//		}
+//
+//		public OutputStream getOutput() {
+//			return output;
+//		}
+//
+//		public int getNonce(){
+//			return nonce;
+//		}
+//
+//		public void setInput(InputStream input) {
+//			this.input = input;
+//		}
+//
+//		public void setOutput(OutputStream output) {
+//			this.output = output;
+//		}
+//
+//		public void setNonce(int newnonce) {
+//			nonce = newnonce;
+//		}
+//	}
 
-	public class Stream {
-		private InputStream input;
-		private OutputStream output;
-		private int nonce;
-
-		public void Stream(InputStream in, OutputStream out, int newnonce){
-			this.input = in;
-			this.output = out;
-			this.nonce = newnonce;
-		}
-
-		public InputStream getInput() {
-			return input;
-		}
-
-		public OutputStream getOutput() {
-			return output;
-		}
-
-		public int getNonce(){
-			return nonce;
-		}
-
-		public void setInput(InputStream input) {
-			this.input = input;
-		}
-
-		public void setOutput(OutputStream output) {
-			this.output = output;
-		}
-
-		public void setNonce(int newnonce) {
-			nonce = newnonce;
-		}
-	}
 }
