@@ -64,7 +64,7 @@ public class Connection {
 		encryptedKey = ls.cryptoBoxSealEasy(sessionKey.toString(), this.serverKey); // this key is sent
 		output.write(ls.toBinary(encryptedKey));
 
-		this.output.write(recipient.DeviceID.getAsBytes());
+		this.output.write(recipient.DeviceID);
 		encodedKeyLength = this.input.readNBytes(4);
 		keyLengthBuffer = ByteBuffer.wrap(encodedKeyLength);
 		keyLength = keyLengthBuffer.getInt();
@@ -113,7 +113,7 @@ public class Connection {
 		encId = ls.cryptoBoxSealEasy(account.addr.id.toString(), this.serverKey);
 		this.output.write(ls.toBinary(encId));
 
-		this.output.write(account.DeviceID.getAsBytes());
+		this.output.write(account.DeviceID);
 		this.output.write(oldEphKey.getAsBytes());
 
 	}

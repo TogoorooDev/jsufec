@@ -16,7 +16,7 @@ import jsufec.Message;
 
 
 public class Crypto {
-    static ByteBuffer EncryptMessage(LazySodium ls, Account account, Key recipientID, Key recipientEph, Message msg) throws SodiumException{
+    static ByteBuffer EncryptMessage(LazySodium ls, Account account, byte[] recipientID, Key recipientEph, Message msg) throws SodiumException{
         ByteBuffer out;
         String outstr;
 
@@ -31,10 +31,10 @@ public class Crypto {
         return out;
     }
 
-    public static Key GenSharedKey(LazySodium ls, Key ownid, Key owneph, Key theirid, Key theireph) throws SodiumException {
+    public static Key GenSharedKey(LazySodium ls, byte[] ownid, Key owneph, byte[] theirid, Key theireph) throws SodiumException {
         String ownEphTheirEphStr = ls.cryptoBoxBeforeNm(owneph.getAsBytes(), theireph.getAsBytes());
-        String ownIDTheirEphStr = ls.cryptoBoxBeforeNm(ownid.getAsBytes(), theireph.getAsBytes());
-        String ownEphTheirIDStr = ls.cryptoBoxBeforeNm(owneph.getAsBytes(), theirid.getAsBytes());
+        String ownIDTheirEphStr = ls.cryptoBoxBeforeNm(ownid, theireph.getAsBytes());
+        String ownEphTheirIDStr = ls.cryptoBoxBeforeNm(owneph.getAsBytes(), theirid);
 
         byte[] ownEphTheirEph = ls.bytes(ownEphTheirEphStr);
         byte[] ownIDTheirEph = ls.bytes(ownIDTheirEphStr);
