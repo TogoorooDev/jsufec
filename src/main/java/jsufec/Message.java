@@ -1,21 +1,22 @@
 package jsufec;
 
 import java.util.ArrayList;
-import java.time.Instant;
+import java.util.Date;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.BufferUnderflowException;
+import java.sql.Timestamp;
 
 import jsufec.ByteConv;
 
 public class Message {
 	public ArrayList<SufecAddr> otherRecipients;
-	public Instant timestamp;
+	public Timestamp timestamp;
 	public ArrayList<MessageHash> hashes;
 	public MessageContent content;
 	public Message(
 		ArrayList<SufecAddr> otherRecipients,
-		Instant timestamp,
+		Timestamp timestamp,
 		ArrayList<MessageHash> hashes,
 		MessageContent content
 	) {
@@ -31,7 +32,7 @@ public class Message {
 			byte[] addrBytes = addr.toBytes();
 			output.write(addrBytes, 0, addrBytes.length);
 		}
-		output.write(ByteConv.longToBytes(this.timestamp.toEpochMilli()), 0, Long.BYTES);
+		output.write(ByteConv.longToBytes(this.timestamp.getTime()), 0, Long.BYTES);
 		output.write(this.hashes.size());
 		for (MessageHash hash : this.hashes) {
 			byte[] hashBytes = hash.toBytes();
@@ -49,7 +50,7 @@ public class Message {
 			for (int i = 0; i < numOtherRecipients; i++) {
 				recipients.add(SufecAddr.fromBytes(bytes));
 			}
-			Instant timestamp = Instant.ofEpochMilli(bytes.getLong());
+			Timestamp timestamp = new Timestamp(bytes.getLong());
 			ArrayList hashes = new ArrayList();
 			int numHashes = bytes.get() & 0xff;
 			for (int i = 0; i < numHashes; i++) {

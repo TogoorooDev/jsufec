@@ -19,18 +19,17 @@ import com.goterl.lazysodium.utils.Key;
 import com.sun.jna.ptr.ByteByReference;
 
 public class Connection {
-	private static int PORT = 49002;
-	private Socket socket;
-	private OutputStream output;
-	private InputStream input;
-	private Key serverKey;
-	private Key sessionKey;
-	private Stream stream;
-	private byte[] nonce;
-	private Key oldEphKeySec;
-	private Key newEphKeySec;
-	private Account account;
-
+	public static int PORT = 49002;
+	public Socket socket;
+	public OutputStream output;
+	public InputStream input;
+	public Key serverKey;
+	public Key sessionKey;
+	public Stream stream;
+	public byte[] nonce;
+	public Key oldEphKeySec;
+	public Key newEphKeySec;
+	public Account account;
 
 	public Key getServerKey() {
 		return this.serverKey;

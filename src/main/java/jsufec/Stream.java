@@ -8,6 +8,7 @@ import com.goterl.lazysodium.utils.Key;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 
 public class Stream {
     private InputStream input;
@@ -55,6 +56,8 @@ public class Stream {
         out = this.input.readNBytes(len);
 
         decryptedString = ls.cryptoSecretBoxOpenEasy(ls.toHexStr(out), this.nonce, this.combinedKey);
+
+        this.nonce = Crypto.incrementNonce(this.nonce, Box.NONCEBYTES);
 
         return ls.bytes(decryptedString);
     }
